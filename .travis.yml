@@ -1,0 +1,11 @@
+os: linux
+services:
+  - docker
+language: generic
+before_install:
+  - docker login -u cmcquinn -p "$DOCKER_PASS"
+jobs:
+  include:
+    - script: ./build.sh
+after_success:
+  - docker push $REPO
