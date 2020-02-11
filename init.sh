@@ -62,7 +62,7 @@ apt-get install -y build-essential cmake git pkg-config libboost-dev \
 git clone https://github.com/gnss-sdr/gnss-sdr
 cd gnss-sdr/build
 git checkout next
-cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
+cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" ‑DENABLE_PLUTOSDR=ON ‑DENABLE_FPGA=ON
 make -j${JOBS}
 make install
 
