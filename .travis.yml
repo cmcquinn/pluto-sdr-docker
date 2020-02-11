@@ -9,3 +9,4 @@ jobs:
     - script: ./build.sh
 after_success:
   - docker push $REPO
+cache: ccache

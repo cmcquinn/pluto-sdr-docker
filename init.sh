@@ -10,6 +10,9 @@ cd ${WORKDIR}
 
 apt-get update
 
+# Install ccache
+apt-get install -y ccache
+
 # Install GNU Radio and other dependencies
 apt-get -y install gnuradio-dev libxml2 libxml2-dev bison flex cmake git libaio-dev libboost-all-dev swig
 
@@ -18,7 +21,7 @@ git clone https://github.com/analogdevicesinc/libiio.git
 cd libiio
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
 make -j${JOBS}
 make install
 cd ${WORKDIR}
@@ -28,7 +31,7 @@ git clone https://github.com/analogdevicesinc/libad9361-iio.git
 cd libad9361-iio
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
 make -j${JOBS}
 make install
 cd ${WORKDIR}
@@ -38,7 +41,7 @@ git clone https://github.com/analogdevicesinc/gr-iio.git
 cd gr-iio
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
 make -j${JOBS}
 make install
 cd ${WORKDIR}
@@ -59,7 +62,7 @@ apt-get install -y build-essential cmake git pkg-config libboost-dev \
 git clone https://github.com/gnss-sdr/gnss-sdr
 cd gnss-sdr/build
 git checkout next
-cmake ..
+cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
 make -j${JOBS}
 make install
 
