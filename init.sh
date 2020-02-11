@@ -8,6 +8,8 @@ JOBS=$((`nproc`+1))
 export WORKDIR=/tmp
 cd ${WORKDIR}
 
+apt-get update
+
 # Install GNU Radio and other dependencies
 apt-get -y install gnuradio-dev libxml2 libxml2-dev bison flex cmake git libaio-dev libboost-all-dev swig
 
@@ -60,3 +62,9 @@ git checkout next
 cmake ..
 make -j${JOBS}
 make install
+
+# cleanup temporary files to reduce image size
+cd /tmp
+rm -rf ./*
+apt autoclean
+rm -rf /var/lib/apt/lists/*
