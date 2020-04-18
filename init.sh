@@ -5,23 +5,24 @@ set -x # echo commands
 
 JOBS=$((`nproc`+1))
 
-export WORKDIR=/tmp
-cd ${WORKDIR}
+if [ -n "${CONTINUOUS_INTEGRATION}" ]; then 
+    export WORKDIR=/tmp
+    cd ${WORKDIR}
+else
+    export WORKDIR=${PWD}
+fi
 
-apt-get update
-
-# Install ccache
-apt-get install -y ccache
-
-# Install GNU Radio and other dependencies
-apt-get -y install gnuradio-dev libxml2 libxml2-dev bison flex cmake git libaio-dev libboost-all-dev swig
+apt-get update && apt-get install -y software-properties-common
+add-apt-repository ppa:gnuradio/gnuradio-releases
+apt update
+apt install -y gnuradio gnuradio-dev libxml2 libxml2-dev bison flex cmake git libaio-dev libboost-all-dev swig
 
 # Download and build libiio
 git clone https://github.com/analogdevicesinc/libiio.git
 cd libiio
 mkdir build
 cd build
-cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DPYTHON_BINDINGS=ON ..
 make -j${JOBS}
 make install
 cd ${WORKDIR}
@@ -31,7 +32,7 @@ git clone https://github.com/analogdevicesinc/libad9361-iio.git
 cd libad9361-iio
 mkdir build
 cd build
-cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
 make -j${JOBS}
 make install
 cd ${WORKDIR}
@@ -39,32 +40,14 @@ cd ${WORKDIR}
 # Download and build gr-iio
 git clone https://github.com/analogdevicesinc/gr-iio.git
 cd gr-iio
+git checkout upgrade-3.8
 mkdir build
 cd build
-cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
 make -j${JOBS}
 make install
 cd ${WORKDIR}
 ldconfig
-
-# Dependencies for GNSS-SDR
-apt-get install -y build-essential cmake git pkg-config libboost-dev \
-   libboost-date-time-dev libboost-system-dev libboost-filesystem-dev \
-   libboost-thread-dev libboost-chrono-dev libboost-serialization-dev \
-   libboost-program-options-dev libboost-test-dev liblog4cpp5-dev \
-   libuhd-dev gnuradio-dev gr-osmosdr libblas-dev liblapack-dev \
-   libarmadillo-dev libgflags-dev libgoogle-glog-dev libhdf5-dev \
-   libgnutls-openssl-dev libmatio-dev libpugixml-dev libpcap-dev \
-   libprotobuf-dev protobuf-compiler libgtest-dev googletest \
-   python3-mako python3-six
-
-# Build and install GNSS-SDR
-git clone https://github.com/gnss-sdr/gnss-sdr
-cd gnss-sdr/build
-git checkout next
-cmake .. -DCMAKE_C_COMPILER_LAUNCHER="ccache" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" ‑DENABLE_PLUTOSDR=ON ‑DENABLE_FPGA=ON
-make -j${JOBS}
-make install
 
 # cleanup temporary files to reduce image size
 cd /tmp
